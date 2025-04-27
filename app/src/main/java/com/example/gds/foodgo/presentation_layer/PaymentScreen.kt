@@ -1,8 +1,10 @@
 package com.example.gds.foodgo.presentation_layer
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,11 +16,15 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.rounded.FavoriteBorder
 import androidx.compose.runtime.*
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -47,24 +53,36 @@ import androidx.navigation.compose.rememberNavController
 import com.example.gds.foodgo.core.components.PrimaryButton
 import com.example.gds.foodgo.core.navigation.Routes
 
-
 @Composable
 @Preview(showBackground = true)
 fun PaymentScreen(navController: NavController = rememberNavController()) {
+    var isChecked by remember { mutableStateOf(false) }
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
+            .verticalScroll(rememberScrollState())
     ) {
         // Top Icons (Back and Search)
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Start
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
             IconButton(
-                onClick = {navController.popBackStack()}
+                onClick = {
+                    // Explicitly navigate to HomeScreen instead of popping back
+                    navController.navigate(Routes.HomeScreen) {
+                        popUpTo(Routes.HomeScreen) { inclusive = true }
+                        launchSingleTop = true
+                    }
+                }
             ) {
-                Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Back", modifier = Modifier.size(38.dp))
+                Icon(
+                    Icons.Default.ArrowBack,
+                    contentDescription = "Arrow_back icon",
+                    tint = Color.Black.copy(0.6f),
+                    modifier = Modifier.size(32.dp)
+                )
             }
         }
 
@@ -112,7 +130,6 @@ fun PaymentScreen(navController: NavController = rememberNavController()) {
             Text("15 - 30min", fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = Color.Black.copy(0.8f))
         }
 
-
         Spacer(modifier = Modifier.height(38.dp))
 
         // Payment Method Section
@@ -141,9 +158,8 @@ fun PaymentScreen(navController: NavController = rememberNavController()) {
             numberColor = Color.Gray,
             bgColor = Color(0xFFD1E2EC),
             cardIcon = painterResource(R.drawable.visa_icon),
-            cardTypeColor = Color(0xFF333232) // Your desired color
+            cardTypeColor = Color(0xFF333232)
         )
-
 
         Spacer(modifier = Modifier.height(26.dp))
 
@@ -154,7 +170,6 @@ fun PaymentScreen(navController: NavController = rememberNavController()) {
                 modifier = Modifier
                     .size(12.dp)
             ){
-                var isChecked by remember { mutableStateOf(false) }
                 Checkbox(checked = isChecked, onCheckedChange = {isChecked = it}, modifier = Modifier, colors = CheckboxDefaults.colors(
                     checkedColor = colorResource(R.color.gradient_end_color)
                 ))
@@ -162,7 +177,10 @@ fun PaymentScreen(navController: NavController = rememberNavController()) {
             Spacer(modifier = Modifier.width(8.dp))
             Text(
                 text = "Save card details for future payment",
-                fontSize = 16.sp
+                fontSize = 16.sp,
+                modifier = Modifier.clickable{
+                    isChecked = !isChecked
+                }
             )
         }
 
@@ -186,12 +204,18 @@ fun PaymentScreen(navController: NavController = rememberNavController()) {
                 )
             }
 
-            PrimaryButton(onClick = {}, text = "Pay Now")
+            PrimaryButton(
+                onClick = {
+                    navController.navigate(Routes.SuccessScreen) {
+                        popUpTo(Routes.HomeScreen) { inclusive = false }
+                        launchSingleTop = true
+                    }
+                },
+                text = "Pay Now"
+            )
         }
     }
 }
-
-
 
 @Composable
 fun PaymentCard(
@@ -202,7 +226,7 @@ fun PaymentCard(
     isSelected: Boolean,
     bgColor: Color,
     cardIcon: Painter = painterResource(R.drawable.visa_icon),
-    cardTypeColor: Color = Color.Black // default color
+    cardTypeColor: Color = Color.Black
 ) {
     Card(
         modifier = Modifier
@@ -220,7 +244,6 @@ fun PaymentCard(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                // Placeholder for logo
                 Box(
                     modifier = Modifier
                         .size(40.dp)

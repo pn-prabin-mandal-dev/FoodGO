@@ -7,6 +7,7 @@ sealed class Routes{
     object SplashScreen: Routes()
     @Serializable
     object LoginScreen: Routes()
+
     @Serializable
     object SignUpScreen: Routes()
 
@@ -14,7 +15,9 @@ sealed class Routes{
     object HomeScreen: Routes()
 
     @Serializable
-    object DetailScreen: Routes()
+    data class DetailScreen(
+        val foodIndex: Int
+    )
 
     @Serializable
     object CartScreen: Routes()

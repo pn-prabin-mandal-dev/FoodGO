@@ -1,5 +1,6 @@
 package com.example.gds.foodgo.presentation_layer
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -30,6 +31,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import com.example.gds.foodgo.R
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -37,22 +39,32 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.example.gds.foodgo.core.components.PrimaryButton
-
+import com.example.gds.foodgo.core.navigation.Routes
 @Composable
-@Preview(showBackground = true)
-fun LoginScreen(modifier: Modifier = Modifier) {
+fun LoginScreen(navController: NavController) {
     var name by remember { mutableStateOf("") }
     var emailOrPhone by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var isPasswordVisible by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+
+    // Error state variables
+    var nameError by remember { mutableStateOf(false) }
+    var emailOrPhoneError by remember { mutableStateOf(false) }
+    var passwordError by remember { mutableStateOf(false) }
+
     Surface(
         modifier = Modifier
             .fillMaxSize()
@@ -70,7 +82,8 @@ fun LoginScreen(modifier: Modifier = Modifier) {
             )
 
             Text(
-                text = "Login Page", style = TextStyle(
+                text = "Login Page",
+                style = TextStyle(
                     fontSize = 32.sp,
                     fontWeight = FontWeight.Bold,
                     color = colorResource(id = R.color.gradient_end_color)
@@ -78,42 +91,77 @@ fun LoginScreen(modifier: Modifier = Modifier) {
             )
 
             Spacer(modifier = Modifier.height(16.dp))
+
             Column(
                 modifier = Modifier,
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 OutlinedTextField(
                     value = name,
-                    onValueChange = { name = it },
+                    onValueChange = {
+                        name = it
+                        if (nameError) nameError = false
+                    },
                     label = { Text(text = "Name") },
+                    isError = nameError,
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = colorResource(id = R.color.gradient_end_color),
                         unfocusedBorderColor = colorResource(id = R.color.gradient_end_color),
+                        errorBorderColor = Color.Red
                     ),
                     placeholder = { Text("Enter your Name") },
                     leadingIcon = { Icon(Icons.Default.Person, contentDescription = "") },
                     modifier = Modifier.fillMaxWidth()
                 )
+                if (nameError) {
+                    Text(
+                        text = "Name cannot be empty",
+                        color = Color.Red,
+                        fontSize = 12.sp,
+                        modifier = Modifier.padding(start = 12.dp, top = 2.dp)
+                    )
+                }
+
                 OutlinedTextField(
                     value = emailOrPhone,
-                    onValueChange = { emailOrPhone = it },
+                    onValueChange = {
+                        emailOrPhone = it
+                        if (emailOrPhoneError) emailOrPhoneError = false
+                    },
                     label = { Text(text = "Email or Phone") },
+                    isError = emailOrPhoneError,
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = colorResource(id = R.color.gradient_end_color),
                         unfocusedBorderColor = colorResource(id = R.color.gradient_end_color),
+                        errorBorderColor = Color.Red
                     ),
                     placeholder = { Text("Enter your Email or Phone") },
                     leadingIcon = { Icon(Icons.Default.Email, contentDescription = "") },
                     modifier = Modifier.fillMaxWidth()
                 )
+                if (emailOrPhoneError) {
+                    Text(
+                        text = "Email or Phone cannot be empty",
+                        color = Color.Red,
+                        fontSize = 12.sp,
+                        modifier = Modifier.padding(start = 12.dp, top = 2.dp)
+                    )
+                }
+
                 OutlinedTextField(
                     value = password,
-                    onValueChange = { password = it },
+                    onValueChange = {
+                        password = it
+                        if (passwordError) passwordError = false
+                    },
+                    visualTransformation = if (isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                    label = { Text(text = "Password") },
+                    isError = passwordError,
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = colorResource(id = R.color.gradient_end_color),
                         unfocusedBorderColor = colorResource(id = R.color.gradient_end_color),
+                        errorBorderColor = Color.Red
                     ),
-                    label = { Text(text = "Password") },
                     placeholder = { if (isPasswordVisible) Text("Enter your Password") else Text("Show Password") },
                     leadingIcon = { Icon(Icons.Default.Lock, contentDescription = "") },
                     trailingIcon = {
@@ -128,18 +176,27 @@ fun LoginScreen(modifier: Modifier = Modifier) {
                     },
                     modifier = Modifier.fillMaxWidth()
                 )
+                if (passwordError) {
+                    Text(
+                        text = "Password cannot be empty",
+                        color = Color.Red,
+                        fontSize = 12.sp,
+                        modifier = Modifier.padding(start = 12.dp, top = 2.dp)
+                    )
+                }
             }
+
+            Spacer(modifier = Modifier.height(20.dp))
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
+                var isChecked by remember { mutableStateOf(true) }
                 Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Start
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    var isChecked by remember { mutableStateOf(true) }
                     Checkbox(
                         checked = isChecked,
                         onCheckedChange = { isChecked = it },
@@ -149,31 +206,50 @@ fun LoginScreen(modifier: Modifier = Modifier) {
                         )
                     )
                     Text(
-                        text = "Remember Me", style = TextStyle(
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.SemiBold
-                        )
+                        text = "Remember Me",
+                        style = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
                     )
                 }
                 Text(text = "Forgot Password?", color = Color.Blue)
             }
 
             Spacer(modifier = Modifier.height(34.dp))
-            PrimaryButton(onClick = {}, text = "Login")
+
+            PrimaryButton(
+                onClick = {
+                    nameError = name.isEmpty()
+                    emailOrPhoneError = emailOrPhone.isEmpty()
+                    passwordError = password.isEmpty()
+
+                    if (!nameError && !emailOrPhoneError && !passwordError) {
+                        navController.navigate(Routes.HomeScreen)
+                        Toast.makeText(context, "Login Successful!", Toast.LENGTH_SHORT).show()
+                    } else {
+                        Toast.makeText(context, "Please fix the errors!", Toast.LENGTH_SHORT).show()
+                    }
+                },
+                text = "Login"
+            )
+
             Spacer(modifier = Modifier.height(12.dp))
+
             Row(
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text("Don't have an account? ")
-                Text(
-                    text = "Sign Up",
-                    fontWeight = FontWeight.SemiBold,
-                    color = Color.Blue,
-                    modifier = Modifier.clickable { }  // Handle signup click
-                )
+                TextButton(
+                    onClick = {
+                        navController.navigate(Routes.SignUpScreen)
+                    }
+                ) {
+                    Text(
+                        text = "Sign Up",
+                        fontWeight = FontWeight.SemiBold,
+                        color = Color.Blue
+                    )
+                }
             }
         }
-
     }
 }

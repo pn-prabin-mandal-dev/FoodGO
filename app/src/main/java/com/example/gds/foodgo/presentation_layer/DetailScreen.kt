@@ -14,15 +14,23 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.outlined.Favorite
+import androidx.compose.material.icons.outlined.ShoppingCart
+import androidx.compose.material.icons.rounded.FavoriteBorder
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Slider
@@ -42,14 +50,19 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.gds.foodgo.R
 import com.example.gds.foodgo.core.navigation.Routes
+import com.example.gds.foodgo.data.FoodCardData
 
 @Composable
-fun DetailScreen(navController: NavController) {
+@Preview(showBackground = true, showSystemUi = true)
+fun DetailScreen(navController: NavController = rememberNavController(), foodIndex: Int = 0) {
+    val foodData = FoodCardData.foodList()[foodIndex]
     var quantity by remember { mutableStateOf(2) }
     var spicyLevel by remember { mutableStateOf(0.5f) }
     val context = LocalContext.current
@@ -58,7 +71,8 @@ fun DetailScreen(navController: NavController) {
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
-            .padding(16.dp),
+            .padding(16.dp)
+            .verticalScroll(rememberScrollState()),
     ) {
         // top icon
         Box(
@@ -78,24 +92,33 @@ fun DetailScreen(navController: NavController) {
                         modifier = Modifier.size(32.dp)
                     )
                 }
+
+                var isFav by remember { mutableStateOf(false) }
                 IconButton(
                     onClick = {
-                        Toast.makeText(context, "Searched", Toast.LENGTH_SHORT).show()
+                        isFav = !isFav
+                        if (isFav) {
+                            Toast.makeText(context, "Added to favorites ❤️", Toast.LENGTH_SHORT).show()
+                        } else {
+                            Toast.makeText(context, "Removed from favorites 💔", Toast.LENGTH_SHORT).show()
+                        }
                     }
                 ) {
                     Icon(
-                        Icons.Default.Search,
-                        contentDescription = "Setting Icon",
-                        tint = Color.Black.copy(0.6f),
+                        imageVector = if (isFav) Icons.Default.Favorite else Icons.Rounded.FavoriteBorder,
+                        contentDescription = "Favorite icon",
+                        tint = Color.Red.copy(alpha = 0.6f),
                         modifier = Modifier.size(32.dp)
                     )
                 }
+
+
             }
         }
 
         // Top image
         Image(
-            painter = painterResource(id = R.drawable.veg_burger), // Replace with your image
+            painter = painterResource(id = foodData.foodImage), // Replace with your image
             contentDescription = "Burger",
             contentScale = ContentScale.Fit,
             modifier = Modifier
@@ -107,21 +130,20 @@ fun DetailScreen(navController: NavController) {
         Spacer(modifier = Modifier.height(24.dp))
 
         // Title & rating
-        Text("CheeseBurger Wendy’s Burger", color = Color.Black.copy(0.8f), fontWeight = FontWeight.Bold, fontSize = 24.sp)
+        Text(foodData.foodName, color = Color.Black.copy(0.8f), fontWeight = FontWeight.Bold, fontSize = 24.sp)
         Spacer(modifier = Modifier.height(4.dp))
         Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(Icons.Default.Star, contentDescription = "Rating", tint = Color(0xFFFFA000), modifier = Modifier.size(20.dp))
-            Text(" 4.9", fontSize = 14.sp)
-            Text("  •  26 mins", fontSize = 14.sp, color = Color.Gray)
+            Text(foodData.foodRating, fontSize = 14.sp)
+            Text("  •  ${foodData.foodDeliveryTime}", fontSize = 14.sp, color = Color.Gray)
         }
 
         Spacer(modifier = Modifier.height(8.dp))
 
         // Description
         Text(
-            text = "The CheeseBurger Wendy’s Burger is a classic fast food burger that packs a punch of flavour in every bitefood burger that packs a punch of flavour in every bitefood burger that packs a punch of flavour in every bitefood burger that packs a punch of flavour in every bitefood burger that packs a punch of flavour in every bitefood burger that packs a punch of flavour in every bite...",
+            text = foodData.foodDescription,
             fontSize = 14.sp,
-            maxLines = 6,
             overflow = TextOverflow.Ellipsis,
             color = Color.Gray,
             fontWeight = FontWeight.SemiBold
@@ -170,7 +192,7 @@ fun DetailScreen(navController: NavController) {
                         ,
                     ){
                         IconButton(onClick = { if (quantity > 1) quantity-- }) {
-                            Icon(Icons.Default.Delete, contentDescription = "Decrease", tint = Color.White)
+                            Icon(painterResource(R.drawable.minus), contentDescription = "Decrease", tint = Color.White)
                         }
                     }
                     Text("$quantity", fontWeight = FontWeight.Bold, fontSize = 20.sp, modifier = Modifier.padding(horizontal = 8.dp))
@@ -194,28 +216,28 @@ fun DetailScreen(navController: NavController) {
             }
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
 
         // Bottom Buttons
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(200.dp),
+                .height(120.dp),
             contentAlignment = Alignment.BottomCenter
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Button(
-                    onClick = { /* handle price click */ },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF3D00)),
+                Card(
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFFFF3D00)),
                     shape = RoundedCornerShape(16.dp),
                     modifier = Modifier
                         .weight(1f)
                         .height(56.dp)
                 ) {
-                    Text("$8.24", color = Color.White, fontSize = 20.sp)
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
+                        Text("$8.24", color = Color.White, fontSize = 20.sp)
+                    }
                 }
 
                 Spacer(modifier = Modifier.width(28.dp))

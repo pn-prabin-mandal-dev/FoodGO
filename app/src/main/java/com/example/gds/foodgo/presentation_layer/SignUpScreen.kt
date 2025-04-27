@@ -1,9 +1,12 @@
 package com.example.gds.foodgo.presentation_layer
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -11,6 +14,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -20,11 +24,12 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.example.gds.foodgo.R
+import com.example.gds.foodgo.core.navigation.Routes
 
 @Composable
-@Preview(showBackground = true)
-fun SignUpScreen(modifier: Modifier = Modifier) {
+fun SignUpScreen(navController: NavController) {
     var name by remember { mutableStateOf("") }
     var address by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
@@ -37,6 +42,7 @@ fun SignUpScreen(modifier: Modifier = Modifier) {
     var emailError by remember { mutableStateOf(false) }
     var phoneError by remember { mutableStateOf(false) }
     var passwordError by remember { mutableStateOf(false) }
+    val context = LocalContext.current
 
     Surface(
         modifier = Modifier
@@ -44,8 +50,8 @@ fun SignUpScreen(modifier: Modifier = Modifier) {
             .padding(horizontal = 18.dp)
     ) {
         Column(
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally
+            modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()),
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Spacer(modifier = Modifier.height(40.dp))
             Image(
@@ -76,7 +82,12 @@ fun SignUpScreen(modifier: Modifier = Modifier) {
                     },
                     label = { Text(text = "Name") },
                     placeholder = { Text("Enter your Name") },
-                    leadingIcon = { Icon(Icons.Default.Person, contentDescription = "person icon") },
+                    leadingIcon = {
+                        Icon(
+                            Icons.Default.Person,
+                            contentDescription = "person icon"
+                        )
+                    },
                     isError = nameError,
                     supportingText = {
                         if (nameError) Text("Name cannot be empty", color = Color.Red)
@@ -96,7 +107,12 @@ fun SignUpScreen(modifier: Modifier = Modifier) {
                     },
                     label = { Text(text = "Address") },
                     placeholder = { Text("Enter your Address") },
-                    leadingIcon = { Icon(Icons.Default.AddLocation, contentDescription = "location Icon") },
+                    leadingIcon = {
+                        Icon(
+                            Icons.Default.AddLocation,
+                            contentDescription = "location Icon"
+                        )
+                    },
                     isError = addressError,
                     supportingText = {
                         if (addressError) Text("Address cannot be empty", color = Color.Red)
@@ -139,7 +155,10 @@ fun SignUpScreen(modifier: Modifier = Modifier) {
                     leadingIcon = { Icon(Icons.Default.Phone, contentDescription = "phone icon") },
                     isError = phoneError,
                     supportingText = {
-                        if (phoneError) Text("Enter a valid 10-digit phone number", color = Color.Red)
+                        if (phoneError) Text(
+                            "Enter a valid 10-digit phone number",
+                            color = Color.Red
+                        )
                     },
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = colorResource(id = R.color.gradient_end_color),
@@ -184,34 +203,48 @@ fun SignUpScreen(modifier: Modifier = Modifier) {
 
             Spacer(modifier = Modifier.height(34.dp))
 
-            Button(
-                onClick = {
-                    nameError = name.isBlank()
-                    addressError = address.isBlank()
-                    emailError = !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
-                    phoneError = phone.length != 10
-                    passwordError = password.isBlank()
-
-                    val isFormValid = !(nameError || addressError || emailError || phoneError || passwordError)
-
-                    if (isFormValid) {
-                        // Handle account creation logic
-                    }
-                },
+            Card(
+                onClick = { /* No action here, handle inside TextButton */ },
                 modifier = Modifier
                     .width(180.dp)
                     .height(50.dp),
-                colors = ButtonDefaults.buttonColors().copy(
+                colors = CardDefaults.cardColors().copy(
                     containerColor = colorResource(id = R.color.gradient_end_color)
                 ),
                 shape = RoundedCornerShape(12.dp)
             ) {
-                Text(
-                    text = "Create Account",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.SemiBold
-                )
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    TextButton(
+                        onClick = {
+                            nameError = name.isBlank()
+                            addressError = address.isBlank()
+                            emailError = !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
+                            phoneError = phone.length != 10
+                            passwordError = password.isBlank()
+
+                            val isFormValid = !(nameError || addressError || emailError || phoneError || passwordError)
+
+                            if (isFormValid) {
+                                Toast.makeText(context, "Account Created Successfully!", Toast.LENGTH_SHORT).show()
+                                navController.navigate(Routes.LoginScreen)
+                            } else {
+                                Toast.makeText(context, "Please fill the details correctly!", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    ) {
+                        Text(
+                            text = "Create Account",
+                            color = Color.White,
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                    }
+                }
             }
+
 
             Spacer(modifier = Modifier.height(12.dp))
 
@@ -224,7 +257,7 @@ fun SignUpScreen(modifier: Modifier = Modifier) {
                     text = "Login here",
                     fontWeight = FontWeight.SemiBold,
                     color = Color.Blue,
-                    modifier = Modifier.clickable { }  // Handle Login click
+                    modifier = Modifier.clickable {navController.navigate(Routes.LoginScreen) }  // Handle Login click
                 )
             }
         }

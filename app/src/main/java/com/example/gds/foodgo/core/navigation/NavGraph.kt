@@ -8,6 +8,7 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.outlined.Favorite
+import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.ShoppingCart
@@ -24,12 +25,17 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
 import com.example.gds.foodgo.presentation_layer.CartScreen
 import com.example.gds.foodgo.presentation_layer.DetailScreen
 import com.example.gds.foodgo.presentation_layer.FavouriteScreen
 import com.example.gds.foodgo.presentation_layer.HomeScreen
+import com.example.gds.foodgo.presentation_layer.LoginScreen
+import com.example.gds.foodgo.presentation_layer.PaymentScreen
 import com.example.gds.foodgo.presentation_layer.ProfileScreen
+import com.example.gds.foodgo.presentation_layer.SignUpScreen
 import com.example.gds.foodgo.presentation_layer.SplashScreen
+import com.example.gds.foodgo.presentation_layer.SuccessScreen
 
 @Composable
 fun NavGraph() {
@@ -50,7 +56,7 @@ fun NavGraph() {
         NavItem(
             title = "Favourite",
             selectedIcon = Icons.Default.Favorite,
-            unSelectedIcon = Icons.Outlined.Favorite,
+            unSelectedIcon = Icons.Outlined.FavoriteBorder,
             route = Routes.FavouriteScreen
         ),
         NavItem(
@@ -91,20 +97,21 @@ fun NavGraph() {
     ) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = Routes.HomeScreen,
+            startDestination = Routes.HomeScreen, // Changed from SuccessScreen to SplashScreen
             modifier = Modifier.padding(innerPadding)
         ) {
             composable<Routes.SplashScreen> {
                 SplashScreen(navController)
             }
             composable<Routes.HomeScreen> {
-                HomeScreen()
+                HomeScreen(navController = navController)
             }
-            composable<Routes.DetailScreen> {
-                DetailScreen(navController)
+            composable<Routes.DetailScreen> { backStackEntity ->
+                val data = backStackEntity.toRoute<Routes.DetailScreen>()
+                DetailScreen(navController, foodIndex = data.foodIndex)
             }
             composable<Routes.CartScreen> {
-                CartScreen()
+                CartScreen(navController)
             }
             composable<Routes.FavouriteScreen> {
                 FavouriteScreen()
@@ -112,15 +119,20 @@ fun NavGraph() {
             composable<Routes.ProfileScreen> {
                 ProfileScreen(navController = navController)
             }
-
             composable<Routes.ExtraAddingScreen> {
-
+                // TODO: Implement ExtraAddingScreen
             }
             composable<Routes.PaymentScreen> {
-
+                PaymentScreen(navController)
             }
             composable<Routes.SuccessScreen> {
-
+                SuccessScreen(navController)
+            }
+            composable<Routes.LoginScreen> {
+                LoginScreen(navController)
+            }
+            composable<Routes.SignUpScreen> {
+                SignUpScreen(navController = navController)
             }
         }
     }

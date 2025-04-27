@@ -2,6 +2,7 @@ package com.example.gds.foodgo.presentation_layer
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,7 +20,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Card
@@ -42,15 +42,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.example.gds.foodgo.R
 import com.example.gds.foodgo.core.components.PrimaryButton
+import com.example.gds.foodgo.core.navigation.Routes
 
 @Composable
-@Preview(showBackground = true)
-fun CartScreen(modifier: Modifier = Modifier) {
+fun CartScreen(navController: NavController) {
     Surface(
         modifier = Modifier
             .fillMaxSize()
@@ -72,7 +73,8 @@ fun CartScreen(modifier: Modifier = Modifier) {
                     modifier = Modifier,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.SemiBold,
-                    color = colorResource(R.color.gradient_end_color)
+                    color = colorResource(R.color.black),
+                    textDecoration = TextDecoration.Underline
                 )
             }
             Column {
@@ -99,7 +101,8 @@ fun CartScreen(modifier: Modifier = Modifier) {
                             unfocusedIndicatorColor = Color.Transparent,
                             disabledIndicatorColor = Color.Transparent,
                             ),
-                        placeholder = {Text("Enter Promo Code", modifier = Modifier.padding(start = 20.dp))}
+                        modifier = Modifier.padding(start = 16.dp),
+                        placeholder = {Text("Enter Promo Code", modifier = Modifier.padding(start = 4.dp))}
                     )
                     Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxHeight().fillMaxWidth().background(color = colorResource(R.color.gradient_end_color)).clip(
                         RoundedCornerShape(topStart = 0.dp, bottomStart = 0.dp,))){
@@ -140,7 +143,7 @@ fun CartScreen(modifier: Modifier = Modifier) {
 
             Spacer(modifier = Modifier.height(24.dp))
             Box(modifier = Modifier.fillMaxWidth().height(120.dp), contentAlignment = Alignment.BottomCenter){
-                PrimaryButton(onClick = {}, text = "Checkout")
+                PrimaryButton(onClick = {navController.navigate(Routes.PaymentScreen)}, text = "Checkout")
             }
         }
     }
@@ -148,6 +151,7 @@ fun CartScreen(modifier: Modifier = Modifier) {
 
 @Composable
 fun BurgerCardCart() {
+    var itemCount by remember { mutableStateOf(1) }
     Spacer(modifier = Modifier.height(18.dp))
     Card(
         modifier = Modifier
@@ -217,23 +221,23 @@ fun BurgerCardCart() {
                                 color = colorResource(R.color.gradient_end_color)
                             )
 
-                            var itemcount by remember { mutableStateOf(1) }
                             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                                 Card(colors = CardDefaults.cardColors(containerColor = colorResource(R.color.gradient_end_color)),modifier = Modifier.width(30.dp).height(40.dp)) {
-                                    IconButton(onClick = {}) {
+                                    IconButton(onClick = {if(itemCount>1) itemCount--}) {
                                         Icon(
-                                            Icons.Default.Delete,
+                                            painterResource(R.drawable.minus),
                                             contentDescription = "Delete Icon",
-                                            tint = Color.White
+                                            tint = Color.White,
+                                            modifier = Modifier.width(16.dp)
                                         )
                                     }
                                 }
-                                Text(text = "$itemcount", fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
+                                Text(text = "$itemCount", fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
                                 Card(colors = CardDefaults.cardColors(containerColor = colorResource(R.color.gradient_end_color)),modifier = Modifier.width(30.dp).height(40.dp)) {
-                                    IconButton(onClick = {}) {
+                                    IconButton(onClick = {itemCount++}) {
                                         Icon(
                                             Icons.Default.Add,
-                                            contentDescription = "Delete Icon",
+                                            contentDescription = "Add Icon",
                                             tint = Color.White
                                         )
                                     }
