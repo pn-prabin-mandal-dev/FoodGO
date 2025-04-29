@@ -46,9 +46,11 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.gds.foodgo.R
 import com.example.gds.foodgo.core.components.PrimaryButton
 import com.example.gds.foodgo.core.navigation.Routes
+import com.example.gds.foodgo.data.FoodCardData
 
 @Composable
 fun CartScreen(navController: NavController) {
@@ -78,8 +80,8 @@ fun CartScreen(navController: NavController) {
                 )
             }
             Column {
-                BurgerCardCart()
-                BurgerCardCart()
+                BurgerCardCart(foodIndex = 1,navController = navController)
+                BurgerCardCart(foodIndex = 2,navController = navController)
 
             }
             Spacer(modifier = Modifier.height(62.dp))
@@ -150,13 +152,16 @@ fun CartScreen(navController: NavController) {
 }
 
 @Composable
-fun BurgerCardCart() {
+fun BurgerCardCart(foodIndex: Int, navController : NavController) {
+    val foodData = FoodCardData.foodList()[foodIndex]
     var itemCount by remember { mutableStateOf(1) }
     Spacer(modifier = Modifier.height(18.dp))
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .height(110.dp),
+            .height(110.dp).clickable{
+                navController.navigate(Routes.DetailScreen(foodIndex))
+            },
         elevation = CardDefaults.elevatedCardElevation(12.dp)
     ) {
         Row(
@@ -169,7 +174,7 @@ fun BurgerCardCart() {
             ) {
                 Card(shape = RoundedCornerShape(12.dp)) {
                     Image(
-                        painter = painterResource(id = R.drawable.veg_burger),
+                        painter = painterResource(id =foodData.foodImage),
                         contentDescription = "Burger image",
                         modifier = Modifier
                             .width(80.dp)
@@ -185,7 +190,7 @@ fun BurgerCardCart() {
                         .padding(end = 12.dp), verticalArrangement = Arrangement.Center
                 ) {
                     Column(modifier = Modifier) {
-                        Text("HamBurger Fried Chicken Burger", fontWeight = FontWeight.SemiBold)
+                        Text(foodData.foodName, fontWeight = FontWeight.SemiBold)
                         Spacer(modifier = Modifier.height(8.dp))
                         Row(
                             modifier = Modifier.fillMaxWidth(),
@@ -196,7 +201,7 @@ fun BurgerCardCart() {
                                     Icons.Default.AccessTime,
                                     contentDescription = "AccessTime"
                                 )
-                                Text(" 30 min", fontWeight = FontWeight.SemiBold)
+                                Text(foodData.foodDeliveryTime, fontWeight = FontWeight.SemiBold)
                             }
 
                             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -205,7 +210,7 @@ fun BurgerCardCart() {
                                     modifier = Modifier,
                                     contentDescription = "AccessTime"
                                 )
-                                Text(" 4.3", fontWeight = FontWeight.SemiBold)
+                                Text(foodData.foodRating, fontWeight = FontWeight.SemiBold)
                             }
                         }
                         Spacer(modifier = Modifier.height(8.dp))
@@ -215,7 +220,7 @@ fun BurgerCardCart() {
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
                             Text(
-                                "$12.44",
+                                foodData.foodPrice,
                                 fontWeight = FontWeight.ExtraBold,
                                 fontSize = 18.sp,
                                 color = colorResource(R.color.gradient_end_color)

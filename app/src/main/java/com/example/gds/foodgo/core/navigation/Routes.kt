@@ -28,9 +28,6 @@ sealed class Routes{
     object ProfileScreen: Routes()
 
     @Serializable
-    object ExtraAddingScreen: Routes()
-
-    @Serializable
     object PaymentScreen: Routes()
 
     @Serializable

@@ -180,15 +180,15 @@ fun ProfileScreen(navController: NavController = rememberNavController()) {
                         modifier = Modifier.fillMaxWidth(),
                         contentAlignment = Alignment.BottomCenter
                     ) {
-                        Column(
+                        Row(
                             modifier = Modifier.fillMaxWidth(),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.spacedBy(18.dp)
+                            horizontalArrangement = Arrangement.SpaceEvenly,
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
                             Button(
                                 onClick = { isEditable = false },
                                 modifier = Modifier
-                                    .fillMaxWidth(0.7f)
+                                    .width(120.dp)
                                     .height(50.dp),
                                 shape = RoundedCornerShape(12.dp),
                                 colors = ButtonDefaults.buttonColors().copy(
@@ -213,7 +213,7 @@ fun ProfileScreen(navController: NavController = rememberNavController()) {
                                     Toast.makeText(context, "Logout", Toast.LENGTH_SHORT).show()
                                 },
                                 modifier = Modifier
-                                    .fillMaxWidth(0.4f)
+                                    .width(120.dp)
                                     .height(50.dp),
                                 shape = RoundedCornerShape(12.dp),
                                 border = BorderStroke(

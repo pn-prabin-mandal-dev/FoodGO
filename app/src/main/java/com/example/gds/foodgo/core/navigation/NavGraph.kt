@@ -1,13 +1,11 @@
 package com.example.gds.foodgo.core.navigation
 
-import android.media.Image
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.ShoppingCart
-import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Person
@@ -17,8 +15,8 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.compose.NavHost
@@ -67,37 +65,48 @@ fun NavGraph() {
         ),
     )
 
+    // List of routes where the bottom bar should be hidden
+    val routesWithoutBottomBar = listOf(
+        Routes.SplashScreen::class.qualifiedName,
+        Routes.LoginScreen::class.qualifiedName,
+        Routes.SignUpScreen::class.qualifiedName,
+        Routes.SuccessScreen::class.qualifiedName
+    )
+
     Scaffold(
         bottomBar = {
-            NavigationBar {
-                val currentRoutes by navController.currentBackStackEntryAsState()
-                val currentDestination = currentRoutes?.destination?.route
+            val currentRoute by navController.currentBackStackEntryAsState()
+            val currentDestination = currentRoute?.destination?.route
 
-                navItems.forEach { item ->
-                    val selected = currentDestination == item.route::class.qualifiedName
-                    NavigationBarItem(
-                        icon = {
-                            Icon(
-                                if (selected) item.selectedIcon else item.unSelectedIcon,
-                                contentDescription = item.title
-                            )
-                        },
-                        label = { Text(item.title) },
-                        selected = selected,
-                        onClick = {
-                            navController.navigate(item.route) {
-                                popUpTo(navController.graph.startDestinationId)
-                                launchSingleTop = true
-                            }
-                        },
-                    )
+            // Show bottom bar only if the current route is not in routesWithoutBottomBar
+            if (currentDestination !in routesWithoutBottomBar) {
+                NavigationBar {
+                    navItems.forEach { item ->
+                        val selected = currentDestination == item.route::class.qualifiedName
+                        NavigationBarItem(
+                            icon = {
+                                Icon(
+                                    if (selected) item.selectedIcon else item.unSelectedIcon,
+                                    contentDescription = item.title
+                                )
+                            },
+                            label = { Text(item.title) },
+                            selected = selected,
+                            onClick = {
+                                navController.navigate(item.route) {
+                                    popUpTo(navController.graph.startDestinationId)
+                                    launchSingleTop = true
+                                }
+                            },
+                        )
+                    }
                 }
             }
         }
     ) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = Routes.HomeScreen, // Changed from SuccessScreen to SplashScreen
+            startDestination = Routes.SplashScreen,
             modifier = Modifier.padding(innerPadding)
         ) {
             composable<Routes.SplashScreen> {
@@ -106,22 +115,20 @@ fun NavGraph() {
             composable<Routes.HomeScreen> {
                 HomeScreen(navController = navController)
             }
-            composable<Routes.DetailScreen> { backStackEntity ->
-                val data = backStackEntity.toRoute<Routes.DetailScreen>()
+            composable<Routes.DetailScreen> { backStackEntry ->
+                val data = backStackEntry.toRoute<Routes.DetailScreen>()
                 DetailScreen(navController, foodIndex = data.foodIndex)
             }
             composable<Routes.CartScreen> {
                 CartScreen(navController)
             }
             composable<Routes.FavouriteScreen> {
-                FavouriteScreen()
+                FavouriteScreen(navController = navController)
             }
             composable<Routes.ProfileScreen> {
                 ProfileScreen(navController = navController)
             }
-            composable<Routes.ExtraAddingScreen> {
-                // TODO: Implement ExtraAddingScreen
-            }
+
             composable<Routes.PaymentScreen> {
                 PaymentScreen(navController)
             }

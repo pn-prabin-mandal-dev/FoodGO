@@ -38,6 +38,7 @@ fun SplashScreen(navController: NavController = rememberNavController()) {
     }
     Surface(
         modifier = Modifier.fillMaxSize(),
+
         color = Color.Transparent
     ) {
         Box(
