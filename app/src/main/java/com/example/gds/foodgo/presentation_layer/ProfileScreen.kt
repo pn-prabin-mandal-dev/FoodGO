@@ -26,6 +26,7 @@ import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Logout
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.material3.Button
@@ -67,9 +68,9 @@ fun ProfileScreen(navController: NavController = rememberNavController()) {
     val context = LocalContext.current
 
     Column(modifier = Modifier) {
-        var nameTF by remember { mutableStateOf("Surendra Mahato") }
-        var emailTF by remember { mutableStateOf("xinghsurendra2@gmail.com") }
-        var addressTF by remember { mutableStateOf("Bateshwar bazar - 04 Dhanusha Nepal") }
+        var nameTF by remember { mutableStateOf("Prabind Kumar Mandal") }
+        var emailTF by remember { mutableStateOf("pn.prabin.433@gmail.com") }
+        var addressTF by remember { mutableStateOf("RK University, Rajkot 360001") }
         var passwordTF by remember { mutableStateOf("passWord@123") }
         var isEditable by remember { mutableStateOf(true) }
         Box(
@@ -260,11 +261,11 @@ fun ProfileScreen(navController: NavController = rememberNavController()) {
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.profile_image),
+                    Icon(
+                        imageVector = Icons.Default.Person,
                         modifier = Modifier.size(160.dp),
+                        tint = Color.Black.copy(0.6f),
                         contentDescription = "Profile Image",
-                        contentScale = ContentScale.Crop
                     )
                 }
             }

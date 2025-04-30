@@ -1,5 +1,6 @@
 package com.example.gds.foodgo.presentation_layer
 
+import android.annotation.SuppressLint
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -150,6 +151,7 @@ fun CategoryFilter(
     }
 }
 
+@SuppressLint("SuspiciousIndentation")
 @Composable
 @Preview(showBackground = true, showSystemUi = true)
 fun FoodCard(
